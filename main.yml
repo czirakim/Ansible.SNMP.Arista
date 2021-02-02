@@ -1,0 +1,47 @@
+---
+- hosts: switches
+  gather_facts: no
+  serial: 1
+  connection: local
+  vars_files:
+    - vars
+
+  tasks:
+
+  - name: Pre-Check snmp user
+    shell:
+      cmd:  snmpget -v3 -l authPriv -u {{snmpUser}} -a SHA -A {{ snmpAuthPriv }} -x AES -X {{ snmpAuthPriv }} {{ inventory_hostname }}  sysName.0
+    register: result
+    ignore_errors: yes
+
+
+  - name: Check SNMP user existance
+    assert:
+      that:
+         - result.stdout_lines|length == 0
+      msg: "The SNMP user {{snmpUser}} already exist."
+
+
+  - name: run multiple commands on remote nodes
+    eos_command:
+      authorize: true
+      provider: "{{ provider_cli }}"
+      commands:
+        - conf t
+        - snmp-server view all-items iso included
+        - snmp-server group {{snmpUser}} v3 priv read all-items
+        - snmp-server user {{ snmpUser }} {{snmpUser}} v3 auth sha {{ snmpAuthPriv }} priv aes {{ snmpAuthPriv }}
+        - show snmp user
+        - write memory
+    register: output
+
+  - debug:
+      var: output.stdout_lines[4] , output.stdout_lines[5]
+
+  - name: Check snmp user
+    shell:
+      cmd:  snmpget -v3 -l authPriv -u {{snmpUser}} -a SHA -A {{ snmpAuthPriv }} -x AES -X {{ snmpAuthPriv }} {{ inventory_hostname }}  sysName.0
+    register: result
+
+  - debug:
+      var: result.stdout_lines
