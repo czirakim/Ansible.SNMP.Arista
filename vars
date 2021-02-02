@@ -1,0 +1,19 @@
+# Credentials
+username: admin
+password: admin
+
+
+# SNMP authPriv
+snmpUser: snmpUser
+snmpAuthPriv: simplePassword
+
+
+provider_cli:
+  host: "{{ ansible_host }}"
+  username: "{{ username }}"
+  password: "{{ password }}"
+  authorize: true
+  use_ssl: no
+  transport: cli
+  timeout: 200
+  validate_certs: false
