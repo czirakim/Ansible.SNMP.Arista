@@ -10,7 +10,7 @@ The scope of this project is to automate the process of adding/upgradeing
 ## Usage
 
 The project is made of a main yml file , a vars file and an inventory file.
-<br>Var file contains the credentials for the switches, the SNMPv4 user 
+<br>Var file contains the credentials for the switches, the SNMPv3 user 
 <br>and password(I am using the password for encryption, also) and
 <br>the cli connection details.
 <br>The main file contains all the tasks. 
